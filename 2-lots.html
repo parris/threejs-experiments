@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <script src="bower_components/threejs/build/three.js" type="text/javascript"></script>
+    <script src="bower_components/stats.js/build/stats.min.js" type="text/javascript"></script>
+    <script src="helvetiker.js" type="text/javascript"></script>
+    <script>
+        var container = document.createElement('div'),
+            details = document.createElement('div'),
+            stats = new Stats(),
+            material = new THREE.MeshBasicMaterial({
+                color: 0xffffff
+            }),
+            renderer = new THREE.WebGLRenderer({ antialias: true }),
+
+            height = 20,
+            size = 70,
+            font = "helvetiker",
+
+            camera, cameraTarget, scene, group;
+
+        document.body.appendChild(container);
+        camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 1500 );
+        camera.position.set(0, 0, 700);
+        cameraTarget = new THREE.Vector3( 0, 0, 0 );
+        scene = new THREE.Scene();
+
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.top = '0px';
+        window.addEventListener(
+            'resize',
+            onWindowResize,
+            false
+        );
+
+        details.style.position = 'absolute';
+        details.style.top = '0px';
+        details.style.right = '0px';
+        details.style.width = '100px';
+        details.style['font-family'] = 'helvetica';
+        details.style.background = 'black';
+        details.style.color = 'white';
+
+        function createText(text, x, y, z) {
+            var textGeo = new THREE.TextGeometry(text, {
+                size: size,
+                height: height,
+
+                font: font
+            });
+
+            textGeo.computeBoundingBox();
+            textGeo.computeVertexNormals();
+
+            textMesh1 = new THREE.Mesh(textGeo, material);
+
+            textMesh1.position.x = x;
+            textMesh1.position.y = y;
+            textMesh1.position.z = z;
+
+            return textMesh1;
+        }
+
+        function onWindowResize() {
+            windowHalfX = window.innerWidth / 2;
+            windowHalfY = window.innerHeight / 2;
+
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function render() {
+            this.stats.begin();
+            camera.lookAt(cameraTarget);
+            requestAnimationFrame(render);
+            renderer.clear();
+            renderer.render(scene, camera);
+            stats.end();
+
+            var rendererInfo = this.renderer.info;
+
+            var debugInfo = '<p>Textures: <strong>' + rendererInfo.memory.textures + '</strong></p>' +
+                '<p>Geometries: <strong>' + rendererInfo.memory.geometries + '</strong></p>' +
+                '<p>Programs: <strong>' + rendererInfo.memory.programs + '</strong></p>' +
+                '<p>Vertices: <strong>' + rendererInfo.render.vertices + '</strong></p>' +
+                '<p>Faces: <strong>' + rendererInfo.render.faces + '</strong></p>' +
+                '<p>Draw Calls: <strong>' + rendererInfo.render.calls + '</strong></p>';
+
+            details.innerHTML = debugInfo;
+        }
+
+        for (var i=0; i < 1000; i++) {
+            setTimeout(function() {
+                scene.add(createText(i,
+                    Math.floor(Math.random() * 450) - 350,
+                    Math.floor(Math.random() * 200) - 100,
+                    Math.floor(Math.random() * 100) - 50
+                ));
+            }, 0);
+        }
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+        container.appendChild(stats.domElement);
+        container.appendChild(details);
+
+        render();
+    </script>
+</body>
+</html>
