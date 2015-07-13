@@ -1,0 +1,6 @@
+{
+  "name": "threejs-experiments",
+  "root": "./",
+  "clean_urls": false,
+  "error_page": "error.html"
+}
