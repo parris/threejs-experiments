@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <style>
+        body, html {
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .fullscreen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <canvas class="js-cartogram-canvas fullscreen"></canvas>
+    <script src="../bower_components/threejs/build/three.js" type="text/javascript"></script>
+    <script src="../bower_components/stats.js/build/stats.min.js" type="text/javascript"></script>
+    <script src="../bower_components/requirejs/require.js" type="text/javascript"></script>
+    <script src="../cartogram/v0.2.3-pre.js" type="text/javascript"></script>
+    <script>
+        require(['src/cartogram', 'underscore'], function(Cartogram, _) {
+            var canvasEl = document.querySelectorAll('.js-cartogram-canvas')[0];
+
+            var cartogram = new Cartogram(canvasEl, {
+                canvas: canvasEl,
+                backgroundColor: '#F7F7F7',
+                showDebug: false,
+                immediate: false,
+                resizeCanvas: true
+            });
+            var topLevelSceneSet = Cartogram.Shapes.set();
+            var myTextSet = Cartogram.Shapes.set();
+
+            var possibleLabels = ['pizza', 'pepper', 'olives', 'cheese', 'salami'];
+
+            // create a bunch of text on screen and merge it all
+            for (var i=0; i < 200; i++) {
+                for (var j=0; j < 20; j++)
+                    myTextSet.push(Cartogram.Shapes.text(
+                        _.random(-1000, 1000), _.random(-1000, 1000),
+                        possibleLabels[_.random(0, possibleLabels.length - 1)],
+                        {
+                            color: 0x000000
+                        }
+                    ));
+            }
+
+            // let's add our text to the scene
+            topLevelSceneSet.push(myTextSet);
+            // let's plop our scene into cartogram
+            cartogram.paper.add(topLevelSceneSet);
+
+            cartogram.render();
+        });
+    </script>
+</body>
+</html>
